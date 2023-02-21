@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" />
+	<style type="text/css">
+        @page{
+            size: B5 portrait;
+            margin: 0;
+        }
+		body {
+            margin: 0;
+        }
+		.container{
+			position: absolute;
+		}
+
+        .dragBtn{
+            width:30px;
+            height:30px;
+            background-color: black;
+            position:absolute;
+            right:0;
+            bottom:0;
+        }
+        .delBtn{
+            width:30px;
+            height:30px;
+            background-color: black;
+            position:absolute;
+            right:0;
+            top:0;
+        }
+        #back{
+            position: absolute;
+            top:0;
+            left:0;
+            overflow: hidden;
+            box-shadow: #9b9b9b 0px 0px 30px 20px;
+            width: 176mm;
+            height: 250mm;
+            margin:auto;
+        }
+	</style>
+	
+	<script type="text/javascript">
+		
+        function printpage(){
+            var x = document.getElementsByClassName("btn");;
+            var i;
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display='none';
+            }
+            window.print();
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display='block';
+            }
+        }			
+			/*
+			 * 提取一个专门用来设置拖拽的函数
+			 * 参数，开启拖拽的元素
+			 */
+			
+			function drag(obj){
+                obj.ontouchstart = function(event){
+				console.log("111")
+				//设置box1捕获所有鼠标按下的事件
+				/*
+				 * setCapture()
+				 *  - 只有IE支持，但是在火狐中调用时不会报错
+				 * 		而如果使用chrome调用，会报错
+				 */
+                 obj.setCapture && obj.setCapture();
+				
+				
+				event = event ||window.event
+				//div的偏移量，鼠标.clientX-元素.offsetLeft
+				
+				//div的偏移量，鼠标.clientY-元素.offsetTop
+				
+				var ol = event.touches[0].clientX -obj.parentElement.offsetLeft;
+				
+				var ot = event.touches[0].clientY - obj.parentElement.offsetTop;
+				//为document绑定一个onmousemove事件
+				
+				document.ontouchmove = function(event){
+					event = event ||window.event
+					//当鼠标移动时被拖拽的元素跟随鼠标移动 onmousemove
+					
+					//获取鼠标的坐标
+					var left = event.touches[0].clientX-ol;
+					var top = event.touches[0].clientY-ot;
+					//修改box1的位置
+					obj.parentElement.style.left = left+"px";
+					obj.parentElement.style.top = top+"px";
+					
+				};
+				
+				
+				//为元素绑定一个鼠标松开事件
+				document.ontouchend = function(){
+					//当鼠标松开时，被拖拽元素固定在当前位置 onmouseup
+					//取消document的onmousemove事件
+					
+					document.ontouchmove = null;
+					document.ontouchend = null;
+					//当鼠标松开时，取消对事件的捕获
+					obj.releaseCapture && obj.releaseCapture();
+				};
+				/*
+				 * 当我们拖拽一个网页的内容时，浏览器会默认去搜索引擎中搜索内容
+				 *   此时会导致拖拽功能的异常，这是浏览器提供的默认行为
+				 * 	 如果不希望发生这个行为，则可以通过return false来取消默认行为
+				 */
+				return false;
+				};
+                
+				obj.onmousedown = function(event){
+				
+				//设置box1捕获所有鼠标按下的事件
+				/*
+				 * setCapture()
+				 *  - 只有IE支持，但是在火狐中调用时不会报错
+				 * 		而如果使用chrome调用，会报错
+				 */
+                 obj.setCapture && obj.setCapture();
+				
+				
+				event = event ||window.event
+				//div的偏移量，鼠标.clientX-元素.offsetLeft
+				
+				//div的偏移量，鼠标.clientY-元素.offsetTop
+				
+				var ol = event.clientX -obj.offsetLeft;
+				
+				var ot = event.clientY - obj.offsetTop;
+				//为document绑定一个onmousemove事件
+				
+				document.onmousemove = function(event){
+					
+					event = event ||window.event
+					//当鼠标移动时被拖拽的元素跟随鼠标移动 onmousemove
+					
+					//获取鼠标的坐标
+					var left = event.clientX-ol;
+					var top = event.clientY-ot;
+					
+					//修改box1的位置
+					obj.style.left = left+"px";
+					obj.style.top = top+"px";
+					
+				};
+				
+				
+				//为元素绑定一个鼠标松开事件
+				document.onmouseup = function(){
+					//当鼠标松开时，被拖拽元素固定在当前位置 onmouseup
+					//取消document的onmousemove事件
+					
+					document.onmousemove = null;
+					document.onmouseup = null;
+					//当鼠标松开时，取消对事件的捕获
+					obj.releaseCapture && obj.releaseCapture();
+				};
+				/*
+				 * 当我们拖拽一个网页的内容时，浏览器会默认去搜索引擎中搜索内容
+				 *   此时会导致拖拽功能的异常，这是浏览器提供的默认行为
+				 * 	 如果不希望发生这个行为，则可以通过return false来取消默认行为
+				 */
+				return false;
+				};
+			};
+			
+            function dragTo(obj){
+                    console.log("1111111")
+                obj.ontouchstart = function(event){
+                    event = event ||window.event
+                    var disX=event.touches[0].clientX-obj.offsetLeft;
+                    var disY=event.touches[0].clientY-obj.offsetTop;
+                    document.ontouchmove = function(event){
+                        event = event ||window.event
+                        obj.previousElementSibling.style.width=event.touches[0].clientX-disX+obj.offsetWidth+'px';
+                        obj.previousElementSibling.style.height=event.touches[0].clientY-disY+obj.offsetHeight+'px';
+                        
+                    };
+                    
+                    document.ontouchend=function (){
+                        document.ontouchmove = document.ontouchend = null;
+                    };
+                    return false;
+                }
+            }
+	</script>
+</head>
+    <body>
+        <div style="width: 176mm;height: 250mm;">
+        <div id="back" ontouchstart = "return false;">
+        </div>
+        
+    </body>
+</html>
