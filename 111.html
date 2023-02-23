@@ -11,6 +11,7 @@
         }
 		body {
             margin: 0;
+            
         }
 		.container{
 			position: absolute;
@@ -36,26 +37,51 @@
             position: absolute;
             top:0;
             left:0;
-            overflow: hidden;
-            box-shadow: #9b9b9b 0px 0px 30px 20px;
+            overflow-x: hidden;
+            box-shadow: #9a9a9a 0px 0px 20px 30px;
             width: 176mm;
-            height: 250mm;
+            min-height: 250mm;
+            height: auto;
+            background-image: url(back.jpg);
+            background-repeat: repeat-y;
+            background-size: contain;
             margin:auto;
+            overflow-y: visible;
         }
 	</style>
 	
 	<script type="text/javascript">
 		
         function printpage(){
-            var x = document.getElementsByClassName("btn");;
+            var z = document.body.style.zoom;
+            console.log(z);
+            document.body.style.zoom = '1';
+            console.log(z);
+            var x = document.getElementsByClassName("btn");
             var i;
             for (i = 0; i < x.length; i++) {
-                x[i].style.display='none';
+                x[i].style.visibility= "hidden";
+                console.log(x[i].style.diaplay);
             }
-            window.print();
-            for (i = 0; i < x.length; i++) {
-                x[i].style.display='block';
-            }
+            document.getElementById('back').style.boxShadow = 'none';
+
+            setTimeout("window.print();",1000)
+            setTimeout(function (){
+                console.log(z)
+                document.body.style.zoom = z;
+                x = document.getElementsByClassName("btn");
+                document.getElementById('back').style.boxShadow = '#9a9a9a 0px 0px 20px 30px';
+                for (i = 0; i < x.length; i++) {
+                    x[i].removeAttribute("style");
+                    console.log(x[i]);
+                    // document.getElementById('back').style.backgroundImage = 'url(back.jpg)';   
+                }
+            },2000);
+            
+            console.log('z');
+            // for (i = 0; i < x.length; i++) {
+            //     x[i].style.display='block';
+            // }
         }			
 			/*
 			 * 提取一个专门用来设置拖拽的函数
@@ -65,6 +91,7 @@
 			function drag(obj){
                 obj.ontouchstart = function(event){
 				console.log("111")
+                var z = document.body.style.zoom
 				//设置box1捕获所有鼠标按下的事件
 				/*
 				 * setCapture()
@@ -79,9 +106,11 @@
 				
 				//div的偏移量，鼠标.clientY-元素.offsetTop
 				
-				var ol = event.touches[0].clientX -obj.parentElement.offsetLeft;
+				var olp = event.touches[0].clientX
+                var otp = event.touches[0].clientY
 				
-				var ot = event.touches[0].clientY - obj.parentElement.offsetTop;
+				var ol = obj.parentElement.offsetLeft;
+				var ot = obj.parentElement.offsetTop;
 				//为document绑定一个onmousemove事件
 				
 				document.ontouchmove = function(event){
@@ -89,8 +118,8 @@
 					//当鼠标移动时被拖拽的元素跟随鼠标移动 onmousemove
 					
 					//获取鼠标的坐标
-					var left = event.touches[0].clientX-ol;
-					var top = event.touches[0].clientY-ot;
+					var left = (event.touches[0].clientX-olp)/z+ol;
+					var top = (event.touches[0].clientY-otp)/z+ot;
 					//修改box1的位置
 					obj.parentElement.style.left = left+"px";
 					obj.parentElement.style.top = top+"px";
@@ -175,13 +204,17 @@
             function dragTo(obj){
                     console.log("1111111")
                 obj.ontouchstart = function(event){
+                    var z = document.body.style.zoom
                     event = event ||window.event
-                    var disX=event.touches[0].clientX-obj.offsetLeft;
-                    var disY=event.touches[0].clientY-obj.offsetTop;
+                    var disX=event.touches[0].clientX;
+                    var disY=event.touches[0].clientY;
+                    
+                    var disXp=obj.offsetLeft;
+                    var disYp=obj.offsetTop;
                     document.ontouchmove = function(event){
                         event = event ||window.event
-                        obj.previousElementSibling.style.width=event.touches[0].clientX-disX+obj.offsetWidth+'px';
-                        obj.previousElementSibling.style.height=event.touches[0].clientY-disY+obj.offsetHeight+'px';
+                        obj.previousElementSibling.style.width=(event.touches[0].clientX-disX)/z+disXp+obj.offsetWidth+'px';
+                        obj.previousElementSibling.style.height=(event.touches[0].clientY-disY)/z+disYp+obj.offsetHeight+'px';
                         
                     };
                     
@@ -199,4 +232,7 @@
         </div>
         
     </body>
+    <script>
+        document.body.style.zoom = 1;
+    </script>
 </html>
